@@ -1,12 +1,17 @@
 Write-Host "==== Windows 深度清理開始 ====" -ForegroundColor Cyan
 
-# 管理員檢查
-if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator"))
-    { if ($MyInvocation.UnboundArguments.Count -gt 0) {
-        $argList += $MyInvocation.UnboundArguments}
-        Start-Process -FilePath powershell.exe  -Verb RunAs  -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File $PSCommandPath $argList "
-        exit
+# ===== 新增：讀取 .env =====
+$envFile = Join-Path $PSScriptRoot ".env"
+if (Test-Path $envFile) {
+    Get-Content $envFile | ForEach-Object {
+        if ($_ -match '^\s*([^#][^=]+?)\s*=\s*(.+)\s*$') {
+            [System.Environment]::SetEnvironmentVariable($matches[1].Trim(), $matches[2].Trim())
         }
+    }
+}
+
+# ===== 新增：從環境變數讀取設定 =====
+$WMC_PATH = $env:WinMemoryCleaner_PATH
 
 # ---------------- 回收桶 ----------------
 Write-Host "清空回收桶..."
@@ -67,18 +72,20 @@ ipconfig /flushdns | Out-Null
 Write-Host "清理縮圖快取..."
 Remove-Item "$env:LOCALAPPDATA\Microsoft\Windows\Explorer\thumbcache_*" -Force -ErrorAction SilentlyContinue
 
+# ---------------- Windows 官方磁碟清理 (背景) ----------------
+Write-Host "啟動系統磁碟清理..."
+Start-Process cleanmgr.exe -ArgumentList "/sagerun:1 /d c /verylowdisk /autoclean" -WindowStyle Hidden -Wait
+
 # ---------------- 清 RAM (Standby + Modified) ----------------
 Write-Host "釋放可回收記憶體..."
-$WMCPath = "D:\windows\AppFiles\clean-win\WinMemoryCleaner.exe "
+$WMCPath = "$WMC_PATH"
 
 if (Test-Path $WMCPath) {
    & $WMCPath /CombinedPageList /ModifiedFileCache /ModifiedPageList /RegistryCache /StandbyListLowPriority /SystemFileCache /WorkingSet
 } else {
     Write-Host "錯誤：Windows Memory Cleaner 未喺路徑見到！"
+    winget install IgorMundstein.WinMemoryCleaner
 }
 
-# ---------------- Windows 官方磁碟清理 (背景) ----------------
-Write-Host "啟動系統磁碟清理..."
-Start-Process cleanmgr.exe -ArgumentList "/sagerun:1 /d c /verylowdisk /autoclean" -WindowStyle Hidden -Wait
 
 Write-Host "==== 清理完成 ====" -ForegroundColor Green
