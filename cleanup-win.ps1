@@ -64,6 +64,15 @@ Remove-Item "$env:LOCALAPPDATA\Microsoft\Edge\User Data\Default\Cache\*" -Recurs
 # Chrome
 Remove-Item "$env:LOCALAPPDATA\Google\Chrome\User Data\Default\Cache\*" -Recurse -Force -ErrorAction SilentlyContinue
 
+# Brave
+Remove-Item "$env:LOCALAPPDATA\BraveSoftware\Brave-Browser\User Data\Default\Cache\*" -Recurse -Force -ErrorAction SilentlyContinue
+
+# Firefox
+Remove-Item "$env:LOCALAPPDATA\Mozilla\Firefox\Profiles\*\cache2\entries\*" -Recurse -Force -ErrorAction SilentlyContinue
+
+# Opera
+Remove-Item "$env:LOCALAPPDATA\Opera Software\Opera Stable\Cache\*" -Recurse -Force -ErrorAction SilentlyContinue
+
 # ---------------- DNS ----------------
 Write-Host "刷新 DNS..."
 ipconfig /flushdns | Out-Null
@@ -87,5 +96,16 @@ if (Test-Path $WMCPath) {
     winget install IgorMundstein.WinMemoryCleaner
 }
 
-
 Write-Host "==== 清理完成 ====" -ForegroundColor Green
+Try {
+    Import-Module BurntToast -ErrorAction SilentlyContinue
+
+    if (Get-Module -ListAvailable -Name BurntToast) {
+        New-BurntToastNotification -Text "System Cleanup 完成", "所有指定 Cache 已清理完成。"
+        Log "Windows notification sent."
+    } else {
+        Log "BurntToast module not available — skip notification."
+    }
+} Catch {
+    Log "Notification error: $_"
+}
