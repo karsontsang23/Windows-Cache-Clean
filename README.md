@@ -29,10 +29,10 @@
 
 ## ⚙️ 安裝與設定
 
-### 1. 下載資料夾
+### 1. 下載Git倉庫
 
 ```
-https://github.com/karsontsang23/Windows-Cache-Clean.git
+git clone https://github.com/karsontsang23/Windows-Cache-Clean.git
 ```
 
 ---
@@ -44,8 +44,8 @@ https://github.com/karsontsang23/Windows-Cache-Clean.git
 | 參數                       | 說明             | 例子                                             |
 | ------------------------ | -------------- | ---------------------------------------------- |
 | `TASK_NAME`              | 任務名稱           | `SystemCleanup`                                |
-| `CLEAN_TIME`             | 每日開始清理時間（24h）  | `03:00`                                        |
-| `RAM_THRESHOLD_PERCENT`  | 低於某百分比才執行      | `25`                                           |
+| `CLEAN_TIME`             | 每日開始清理時間（24h）  | `06:00pm`                                        |
+| `RAM_THRESHOLD_PERCENT`  | 低於某百分比才執行      | `22.5`                                           |
 | `WinMemoryCleaner_PATH`      | WindowsMemoryCleaner 清理工具路徑 | `C:\Tools\system-cleanup\WindowsMemoryCleaner.exe` |
 | `Script_PATH`               | Script路徑      | `C:\Tools\system-cleanup\`                             |
 
@@ -72,7 +72,7 @@ cleanmgr.exe /sagerun:1
 以 **系統管理員** 身分執行：
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\create_task.ps1
+Setup-CleanTask.ps1
 ```
 
 執行後會自動建立每日定時任務。
@@ -135,7 +135,5 @@ Install-Module -Name BurntToast -Scope CurrentUser -Force
 ✔ **清理 Windows Update Cache 會暫停 update 服務**
 ✔ **某些服務會被停止再啟動（例如 WSearch）**
 ✔ **有些 Cache 無法刪除因檔案被鎖定**
-
-
 如果你要，我可以幫你 **產生可下載嘅 ZIP**（包所有檔案同 README），等你可以直接落機即用。
 想要嘅話講我知你想嘅 **排程時間 / RAM 門檻 / 清理項目**！
