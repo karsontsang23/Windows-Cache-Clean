@@ -29,10 +29,10 @@
 
 ## ⚙️ 安裝與設定
 
-### 1. 建立資料夾
+### 1. 下載資料夾
 
 ```
-C:\Tools\system-cleanup\
+https://github.com/karsontsang23/Windows-Cache-Clean.git
 ```
 
 ---
@@ -129,7 +129,7 @@ powershell -ExecutionPolicy Bypass -File .\create_task.ps1
 
 ```powershell
 Install-Module -Name BurntToast -Scope CurrentUser -Force
----
+```
 
 ## ❗ 注意與建議
 ✔ **清理 Windows Update Cache 會暫停 update 服務**
