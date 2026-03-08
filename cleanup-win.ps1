@@ -1,5 +1,13 @@
 Write-Host "==== Windows 深度清理開始 ====" -ForegroundColor Cyan
 
+# 管理員檢查
+if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator"))
+    { if ($MyInvocation.UnboundArguments.Count -gt 0) {
+        $argList += $MyInvocation.UnboundArguments}
+        Start-Process -FilePath powershell.exe  -Verb RunAs  -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File $PSCommandPath $argList "
+        exit
+        }
+        
 # ===== 新增：讀取 .env =====
 $envFile = Join-Path $PSScriptRoot ".env"
 if (Test-Path $envFile) {
