@@ -135,5 +135,3 @@ Install-Module -Name BurntToast -Scope CurrentUser -Force
 ✔ **清理 Windows Update Cache 會暫停 update 服務**
 ✔ **某些服務會被停止再啟動（例如 WSearch）**
 ✔ **有些 Cache 無法刪除因檔案被鎖定**
-如果你要，我可以幫你 **產生可下載嘅 ZIP**（包所有檔案同 README），等你可以直接落機即用。
-想要嘅話講我知你想嘅 **排程時間 / RAM 門檻 / 清理項目**！
