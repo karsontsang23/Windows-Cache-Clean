@@ -15,6 +15,7 @@ if (Test-Path $envFile) {
 $TASK_NAME = $env:TASK_NAME
 $CLEAN_TIME = $env:CLEAN_TIME
 $PATH_TARGET = $env:Script_PATH
+$WMC_PATH = $env:WinMemoryCleaner_PATH
 $RAM_THRESHOLD_PERCENT = $env:RAM_THRESHOLD_PERCENT
 $batPath = "$PATH_TARGET\RunCleanup.bat"
 $xmlPath = "$PATH_TARGET\Cleanup_Task.xml"
@@ -67,6 +68,10 @@ if (Get-ScheduledTask -TaskName $TASK_NAME -ErrorAction SilentlyContinue) {
 Register-ScheduledTask -TaskName $TASK_NAME -Action $action -Trigger $trigger -Principal $principal  -Description "Cleanup Windows Cache" -Force
 
 Write-Host "Task '$TASK_NAME' 已建立"
+
+# ------------------安裝服務---------------------
+
+& $WMC_PATH /Install
 
 # ------------------- 匯出 XML -------------------
 try {

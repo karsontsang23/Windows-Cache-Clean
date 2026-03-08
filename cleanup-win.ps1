@@ -27,37 +27,62 @@ Clear-RecycleBin -Force -ErrorAction SilentlyContinue
 
 # ---------------- TEMP ----------------
 Write-Host "清理 TEMP..."
-Remove-Item "$env:TEMP\*" -Recurse -Force -ErrorAction SilentlyContinue
-Remove-Item "C:\Program Files (x86)\Microsoft\Temp\*" -Recurse -Force -ErrorAction SilentlyContinue
-Remove-Item "C:\Users\ChingNok\AppData\Roaming\Microsoft\Windows\Templates\*" -Recurse -Force -ErrorAction SilentlyContinue
-Remove-Item "C:\Windows\Temp\*" -Recurse -Force -ErrorAction SilentlyContinue
+$p = [System.IO.Path]::GetTempPath()
+foreach ($f in [System.IO.Directory]::GetFiles($p, '*', 1)) { [System.IO.File]::Delete($f) }
+foreach ($d in [System.IO.Directory]::GetDirectories($p)) { [System.IO.Directory]::Delete($d, 1) }
+$p = "C:\Program Files (x86)\Microsoft\Temp"
+foreach ($f in [System.IO.Directory]::GetFiles($p, '*', 1)) { try { [System.IO.File]::Delete($f) } catch {} }
+foreach ($d in [System.IO.Directory]::GetDirectories($p)) { try { [System.IO.Directory]::Delete($d, 1) } catch {} }
+$p = "C:\Users\ChingNok\AppData\Roaming\Microsoft\Windows\Templates"
+foreach ($f in [System.IO.Directory]::GetFiles($p, '*', 1)) { try { [System.IO.File]::Delete($f) } catch {} }
+foreach ($d in [System.IO.Directory]::GetDirectories($p)) { try { [System.IO.Directory]::Delete($d, 1) } catch {} }
+$p = "C:\Windows\Temp"
+foreach ($f in [System.IO.Directory]::GetFiles($p, '*', 1)) { try { [System.IO.File]::Delete($f) } catch {} }
+foreach ($d in [System.IO.Directory]::GetDirectories($p)) { try { [System.IO.Directory]::Delete($d, 1) } catch {} }
 
 # ---------------- Prefetch ----------------
 Write-Host "清理 Prefetch..."
-Remove-Item "C:\Windows\Prefetch\*" -Recurse -Force -ErrorAction SilentlyContinue
+$p = "C:\Windows\Prefetch"
+foreach ($f in [System.IO.Directory]::GetFiles($p, '*', 1)) { try { [System.IO.File]::Delete($f) } catch {} }
+foreach ($d in [System.IO.Directory]::GetDirectories($p)) { try { [System.IO.Directory]::Delete($d, 1) } catch {} }
 
 # ---------------- Windows Update Cache ----------------
 Write-Host "清理 Windows Update 快取..."
-net stop wuauserv | Out-Null
-net stop bits | Out-Null
-Remove-Item "C:\Windows\SoftwareDistribution\Download\*" -Recurse -Force -ErrorAction SilentlyContinue
-net start wuauserv | Out-Null
-net start bits | Out-Null
+[System.ServiceProcess.ServiceController]::New('wuauserv').Stop()
+[System.ServiceProcess.ServiceController]::New('bits').Stop()
+$p = "C:\Windows\SoftwareDistribution\Download"                                                                                         
+foreach ($f in [System.IO.Directory]::GetFiles($p, '*', 1)) { try { [System.IO.File]::Delete($f) } catch {} }      
+foreach ($d in [System.IO.Directory]::GetDirectories($p)) { try { [System.IO.Directory]::Delete($d, 1) } catch {} }
+[System.ServiceProcess.ServiceController]::New('wuauserv').Start()
+[System.ServiceProcess.ServiceController]::New('bits').Start()
 
 # ---------------- Delivery Optimization ----------------
 Write-Host "清理 Delivery Optimization..."
-Remove-Item "C:\Windows\ServiceProfiles\NetworkService\AppData\Local\Microsoft\Windows\DeliveryOptimization\Cache\*" -Recurse -Force -ErrorAction SilentlyContinue
+$p = "C:\Windows\ServiceProfiles\NetworkService\AppData\Local\Microsoft\Windows\DeliveryOptimization\Cache\"                                                                    
+foreach ($f in [System.IO.Directory]::GetFiles($p, '*', 1)) { try { [System.IO.File]::Delete($f) } catch {} }      
+foreach ($d in [System.IO.Directory]::GetDirectories($p)) { try { [System.IO.Directory]::Delete($d, 1) } catch {} }
 
 # ---------------- 清 DirectX Shader ----------------
 Write-Host "清理 GPU Shader Cache..."
-Remove-Item "$env:LOCALAPPDATA\D3DSCache\*" -Recurse -Force -ErrorAction SilentlyContinue
-Remove-Item "$env:LOCALAPPDATA\NVIDIA\DXCache\*" -Recurse -Force -ErrorAction SilentlyContinue
-Remove-Item "$env:LOCALAPPDATA\NVIDIA\GLCache\*" -Recurse -Force -ErrorAction SilentlyContinue
-Remove-Item "$env:LOCALAPPDATA\AMD\DxCache\*" -Recurse -Force -ErrorAction SilentlyContinue
+$p = "C:\Windows\ServiceProfiles\NetworkService\AppData\Local\Microsoft\Windows\DeliveryOptimization\Cache\"       
+foreach ($f in [System.IO.Directory]::GetFiles($p, '*', 1)) { try { [System.IO.File]::Delete($f) } catch {} }      
+foreach ($d in [System.IO.Directory]::GetDirectories($p)) { try { [System.IO.Directory]::Delete($d, 1) } catch {} }
+$p = "$env:LOCALAPPDATA\D3DSCache"
+foreach ($f in [System.IO.Directory]::GetFiles($p, '*', 1)) { try { [System.IO.File]::Delete($f) } catch {} }
+foreach ($d in [System.IO.Directory]::GetDirectories($p)) { try { [System.IO.Directory]::Delete($d, 1) } catch {} }
+$p = "$env:LOCALAPPDATA\NVIDIA\DXCache"
+foreach ($f in [System.IO.Directory]::GetFiles($p, '*', 1)) { try { [System.IO.File]::Delete($f) } catch {} }
+foreach ($d in [System.IO.Directory]::GetDirectories($p)) { try { [System.IO.Directory]::Delete($d, 1) } catch {} }
+$p = "$env:LOCALAPPDATA\NVIDIA\GLCache"
+foreach ($f in [System.IO.Directory]::GetFiles($p, '*', 1)) { try { [System.IO.File]::Delete($f) } catch {} }
+foreach ($d in [System.IO.Directory]::GetDirectories($p)) { try { [System.IO.Directory]::Delete($d, 1) } catch {} }
+$p = "$env:LOCALAPPDATA\AMD\DxCache"
+foreach ($f in [System.IO.Directory]::GetFiles($p, '*', 1)) { try { [System.IO.File]::Delete($f) } catch {} }
+foreach ($d in [System.IO.Directory]::GetDirectories($p)) { try { [System.IO.Directory]::Delete($d, 1) } catch {} }
 
 # ---------------- 暫停搜尋索引（減IO） ----------------
 Write-Host "暫停搜尋索引..."
-net stop WSearch | Out-Null
+[System.ServiceProcess.ServiceController]::New('WSearch').Stop()
 
 # ---------------- Microsoft Store ----------------
 Write-Host "重置 Microsoft Store Cache..."
@@ -67,19 +92,32 @@ wsreset.exe | Out-Null
 Write-Host "清理瀏覽器快取..."
 
 # Edge
-Remove-Item "$env:LOCALAPPDATA\Microsoft\Edge\User Data\Default\Cache\*" -Recurse -Force -ErrorAction SilentlyContinue
+$p = "$env:LOCALAPPDATA\Microsoft\Edge\User Data\Default\Cache"
+foreach ($f in [System.IO.Directory]::GetFiles($p, '*', 1)) { try { [System.IO.File]::Delete($f) } catch {} }
+foreach ($d in [System.IO.Directory]::GetDirectories($p)) { try { [System.IO.Directory]::Delete($d, 1) } catch {} }
 
 # Chrome
-Remove-Item "$env:LOCALAPPDATA\Google\Chrome\User Data\Default\Cache\*" -Recurse -Force -ErrorAction SilentlyContinue
+$p = "$env:LOCALAPPDATA\Google\Chrome\User Data\Default\Cache"
+foreach ($f in [System.IO.Directory]::GetFiles($p, '*', 1)) { try { [System.IO.File]::Delete($f) } catch {} }
+foreach ($d in [System.IO.Directory]::GetDirectories($p)) { try { [System.IO.Directory]::Delete($d, 1) } catch {} }
 
 # Brave
-Remove-Item "$env:LOCALAPPDATA\BraveSoftware\Brave-Browser\User Data\Default\Cache\*" -Recurse -Force -ErrorAction SilentlyContinue
+$p = "$env:LOCALAPPDATA\BraveSoftware\Brave-Browser\User Data\Default\Cache"
+foreach ($f in [System.IO.Directory]::GetFiles($p, '*', 1)) { try { [System.IO.File]::Delete($f) } catch {} }
+foreach ($d in [System.IO.Directory]::GetDirectories($p)) { try { [System.IO.Directory]::Delete($d, 1) } catch {} }
 
 # Firefox
-Remove-Item "$env:LOCALAPPDATA\Mozilla\Firefox\Profiles\*\cache2\entries\*" -Recurse -Force -ErrorAction SilentlyContinue
+foreach($p in [System.IO.Directory]::GetDirectories("$env:LOCALAPPDATA\Mozilla\Firefox\Profiles")){
+    $e="$p\cache2\entries";if([System.IO.Directory]::Exists($e)){
+        foreach($f in [System.IO.Directory]::GetFiles($e,'*',1)){try{[System.IO.File]::Delete($f)}catch{}}
+        foreach($d in [System.IO.Directory]::GetDirectories($e)){try{[System.IO.Directory]::Delete($d,1)}catch{}}
+    }
+}
 
 # Opera
-Remove-Item "$env:LOCALAPPDATA\Opera Software\Opera Stable\Cache\*" -Recurse -Force -ErrorAction SilentlyContinue
+$p = "$env:LOCALAPPDATA\Opera Software\Opera Stable\Cache"
+foreach ($f in [System.IO.Directory]::GetFiles($p, '*', 1)) { try { [System.IO.File]::Delete($f) } catch {} }
+foreach ($d in [System.IO.Directory]::GetDirectories($p)) { try { [System.IO.Directory]::Delete($d, 1) } catch {} }
 
 # ---------------- DNS ----------------
 Write-Host "刷新 DNS..."
@@ -87,7 +125,8 @@ ipconfig /flushdns | Out-Null
 
 # ---------------- Thumbnail ----------------
 Write-Host "清理縮圖快取..."
-Remove-Item "$env:LOCALAPPDATA\Microsoft\Windows\Explorer\thumbcache_*" -Force -ErrorAction SilentlyContinue
+$p = "$env:LOCALAPPDATA\Microsoft\Windows\Explorer"
+foreach ($f in [System.IO.Directory]::GetFiles($p, 'thumbcache_*')) { try { [System.IO.File]::Delete($f) } catch {} }
 
 # ---------------- Windows 官方磁碟清理 (背景) ----------------
 Write-Host "啟動系統磁碟清理..."
@@ -95,10 +134,9 @@ Start-Process cleanmgr.exe -ArgumentList "/sagerun:1 /d c /verylowdisk /autoclea
 
 # ---------------- 清 RAM (Standby + Modified) ----------------
 Write-Host "釋放可回收記憶體..."
-$WMCPath = "$WMC_PATH"
 
-if (Test-Path $WMCPath) {
-   & $WMCPath /CombinedPageList /ModifiedFileCache /ModifiedPageList /RegistryCache /StandbyListLowPriority /SystemFileCache /WorkingSet
+if (Test-Path $WMC_PATH) {
+   & $WMC_PATH /CombinedPageList /ModifiedFileCache /ModifiedPageList /RegistryCache /StandbyListLowPriority /SystemFileCache /WorkingSet
 } else {
     Write-Host "錯誤：Windows Memory Cleaner 未喺路徑見到！"
     winget install IgorMundstein.WinMemoryCleaner
@@ -106,10 +144,10 @@ if (Test-Path $WMCPath) {
 
 Write-Host "==== 清理完成 ====" -ForegroundColor Green
 Try {
-    Import-Module BurntToast -ErrorAction SilentlyContinue
+    Install-Module -Name BurntToast -Scope CurrentUser -Force -ErrorAction SilentlyContinue
 
     if (Get-Module -ListAvailable -Name BurntToast) {
-        New-BurntToastNotification -Text "System Cleanup 完成", "所有指定 Cache 已清理完成。"
+        New-BurntToastNotification -Text "所有指定 Cache 已清理完成。"
         Log "Windows notification sent."
     } else {
         Log "BurntToast module not available — skip notification."
