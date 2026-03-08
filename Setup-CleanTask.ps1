@@ -51,26 +51,26 @@ powershell -Command " $totalRAM = (Get-CimInstance Win32_ComputerSystem).TotalPh
 Set-Content -Path $batPath -Value $wrapperScript -Force
 
 # 每日  執行，24 小時重複
-$trigger = New-ScheduledTaskTrigger -Daily -At "$CLEAN_TIME"
+$trigger = New-ScheduledTaskTrigger -At "$CLEAN_TIME" -Daily
 
-# ------------------- 動作 (Action) -------------------"powershell.exe" -Argument "-NoProfile -WindowStyle Hidden -ExecutionPo
-$action = New-ScheduledTaskAction -Execute $wrapperPath
+# ------------------- 動作 (Action) -------------------
+$action = New-ScheduledTaskAction -Execute $batPath -WorkingDirectory $PATH_TARGET 
 
 # ------------------- Principal (SYSTEM) -------------------
-$principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
+$principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -RunLevel Highest -LogonType ServiceAccount
 
 # ------------------- 註冊工作 -------------------
 if (Get-ScheduledTask -TaskName $TASK_NAME -ErrorAction SilentlyContinue) {
     Unregister-ScheduledTask -TaskName $TASK_NAME -Confirm:$false
 }
 
-Register-ScheduledTask -TaskName $TASK_NAME -Action $action -Trigger $trigger -Principal $principal 
+Register-ScheduledTask -TaskName $TASK_NAME -Action $action -Trigger $trigger -Principal $principal  -Description "Cleanup Windows Cache" -Force
 
 Write-Host "Task '$TASK_NAME' 已建立"
 
 # ------------------- 匯出 XML -------------------
 try {
-    Export-ScheduledTask -TaskName $TASK_NAME -TaskPath "\" -Xml $xmlPath -Force
+    Export-ScheduledTask -TaskName $TASK_NAME -TaskPath "\" | Out-File -FilePath $xmlPath -Force
     Write-Host "已產生可匯入 XML 檔: $xmlPath"
 } catch {
     Write-Warning "匯出 XML 失敗: $_"
